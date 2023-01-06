@@ -13,8 +13,8 @@
 
 %token ELSE END FALSE IF IN LET NOT THEN TRUE
 %token PLUS MINUS TIMES DIV MOD
-%token EQ NE GT LT GE LE
-%token LPAR RPAR 
+%token EQ NE GT LT GE LE WITHIN
+%token LPAR RPAR RRAWPAR LRAWPAR COMMA
 %token EOF
 
 %left ELSE              /* lowest precedence  */
@@ -50,6 +50,7 @@ Expr:
   | Expr LT    Expr                     { Prim("<",  $1, $3)     }
   | Expr GE    Expr                     { Prim(">=", $1, $3)     }
   | Expr LE    Expr                     { Prim("<=", $1, $3)     }
+  | Expr WITHIN RRAWPAR Expr COMMA Expr LRAWPAR { InCheck($1, $4, $6) }
 ;
 
 AtExpr:

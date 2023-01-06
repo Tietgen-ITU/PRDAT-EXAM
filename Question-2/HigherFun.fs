@@ -65,8 +65,15 @@ let rec eval (e : expr) (env : value env) : value =
         let xVal = eval eArg env
         let fBodyEnv = (x, xVal) :: (f, fClosure) :: fDeclEnv
         in eval fBody fBodyEnv
-      | _ -> failwith "eval Call: not a function";;
+      | _ -> failwith "eval Call: not a function"
+    | InCheck (e, e1, e2) -> 
+      let v = eval e env
+      let v1 = eval e1 env
+      let v2 = eval e2 env
 
+      match v >= v1 && v <= v2 with
+      | true -> Int (1)
+      | false -> Int (0);;
 (* Evaluate in empty environment: program must have no free variables: *)
 
 let run e = eval e [];;

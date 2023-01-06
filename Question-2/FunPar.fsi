@@ -4,12 +4,16 @@ type token =
   | EOF
   | LPAR
   | RPAR
+  | RRAWPAR
+  | LRAWPAR
+  | COMMA
   | EQ
   | NE
   | GT
   | LT
   | GE
   | LE
+  | WITHIN
   | PLUS
   | MINUS
   | TIMES
@@ -31,12 +35,16 @@ type tokenId =
     | TOKEN_EOF
     | TOKEN_LPAR
     | TOKEN_RPAR
+    | TOKEN_RRAWPAR
+    | TOKEN_LRAWPAR
+    | TOKEN_COMMA
     | TOKEN_EQ
     | TOKEN_NE
     | TOKEN_GT
     | TOKEN_LT
     | TOKEN_GE
     | TOKEN_LE
+    | TOKEN_WITHIN
     | TOKEN_PLUS
     | TOKEN_MINUS
     | TOKEN_TIMES
