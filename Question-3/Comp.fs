@@ -114,6 +114,30 @@ let makeGlobalEnvs (topdecs : topdec list) : varEnv * funEnv * instr list =
    * funEnv  is the global function environment
 *)
 
+let ppVar = function
+  | Glovar i -> $"Global[{i}]"
+  | Locvar i -> $"bp[{i}]"
+
+let ppVarTyp (varName, (variable, varType)) = 
+  $"{varName}:{ppTyp varType} at {ppVar variable}"
+
+
+let exVarEnv : varEnv =
+  ([("a", (Locvar 6, TypA (TypI,Some 2)));
+  ("pn", (Locvar 3, TypA (TypP TypI,Some 1)));
+  ("p", (Locvar 1, TypP TypI));
+  ("n", (Locvar 0, TypI));
+  ("g", (Glovar 0, TypI))], 7);;
+
+let ppVarEnv (env: varEnv) = 
+  (fst env) 
+  |> List.rev 
+  |> List.map ppVarTyp
+
+let printVarEnv varEnv =
+  List.iter (printf "\n%s") (ppVarEnv varEnv);
+  printf "\n"
+
 let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list = 
     match stmt with
     | If(e, stmt1, stmt2) -> 
@@ -133,7 +157,7 @@ let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list =
     | Block stmts -> 
       let rec loop stmts varEnv =
           match stmts with 
-          | []     -> (snd varEnv, [])
+          | []     -> printVarEnv varEnv ; (snd varEnv, [])
           | s1::sr -> 
             let (varEnv1, code1) = cStmtOrDec s1 varEnv funEnv
             let (fdepthr, coder) = loop sr varEnv1 
@@ -272,3 +296,5 @@ let compileToFile program fname =
     instrs
 
 (* Example programs are found in the files ex1.c, ex2.c, etc *)
+
+

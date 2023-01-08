@@ -24,6 +24,7 @@ let keyword s =
     | "null"    -> NULL
     | "print"   -> PRINT
     | "println" -> PRINTLN
+    | "printCurFrame -> PRINTFRAME
     | "return"  -> RETURN
     | "true"    -> CSTBOOL 1
     | "void"    -> VOID 

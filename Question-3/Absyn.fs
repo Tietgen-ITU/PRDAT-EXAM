@@ -35,6 +35,7 @@ and stmt =
   | Expr of expr                     (* Expression statement   e;   *)
   | Return of expr option            (* Return from method          *)
   | Block of stmtordec list          (* Block: grouping and scope   *)
+  | PrintCurFrame
                                                                    
 and stmtordec =                                                    
   | Dec of typ * string              (* Local variable declaration  *)
@@ -46,3 +47,14 @@ and topdec =
 
 and program = 
   | Prog of topdec list
+
+
+let ppTyp =
+
+  let rec aux = function
+    | TypI -> "int"
+    | TypC -> "char"
+    | TypP t -> $"(*{aux t})"
+    | TypA (t, i) -> $"({aux t}[{Option.defaultWith (fun () -> 0) i}])"
+
+  aux

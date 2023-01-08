@@ -41,6 +41,7 @@ type instr =
   | PRINTC                             (* print s[sp] as character        *)
   | LDARGS                             (* load command line args on stack *)
   | STOP                               (* halt the abstract machine       *)
+  | PRINTCURFRAME of (int * string) list
 
 (* Generate new distinct labels *)
 
