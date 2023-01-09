@@ -43,6 +43,10 @@ type token =
   | RETURN
   | VOID
   | WHILE
+  | PUSHSTACK
+  | PRINTSTACK
+  | POPSTACK
+  | CREATESTACK
   | CSTSTRING of (string)
   | NAME of (string)
   | CSTINT of (int)
@@ -90,6 +94,10 @@ type tokenId =
     | TOKEN_RETURN
     | TOKEN_VOID
     | TOKEN_WHILE
+    | TOKEN_PUSHSTACK
+    | TOKEN_PRINTSTACK
+    | TOKEN_POPSTACK
+    | TOKEN_CREATESTACK
     | TOKEN_CSTSTRING
     | TOKEN_NAME
     | TOKEN_CSTINT

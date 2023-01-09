@@ -149,7 +149,7 @@ AtExprNotAccess:
   | SETCDR LPAR Expr COMMA Expr RPAR    { Prim2("setcdr",$3,$5)     }
   | CREATESTACK LPAR Expr RPAR          { Prim1("createStack", $3)  }
   | PUSHSTACK LPAR Expr COMMA Expr RPAR { Prim2("pushStack", $3, $5)}
-  | POPSTACK LPAR Expr COMMA Expr RPAR  { Prim2("popStack", $3, $5) }
+  | POPSTACK LPAR Expr RPAR             { Prim1("popStack", $3)     }
 ;
 
 Access:

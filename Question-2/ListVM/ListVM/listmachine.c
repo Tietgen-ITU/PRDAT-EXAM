@@ -151,6 +151,7 @@ word* readfile(char* filename);
 #endif
 
 #define CONSTAG 0
+#define STACKTAG 1
 
 // Heap size in words
 
@@ -195,6 +196,10 @@ word *freelist;
 #define CDR 29
 #define SETCAR 30
 #define SETCDR 31
+#define CREATESTACK 32
+#define PUSHSTACK 33
+#define POPSTACK 34
+#define PRINTSTACK 35
 
 #define STACKSIZE 1000
 
@@ -237,6 +242,10 @@ void printInstruction(word p[], word pc) {
   case CDR:    printf("CDR"); break;
   case SETCAR: printf("SETCAR"); break;
   case SETCDR: printf("SETCDR"); break;
+  case CREATESTACK: printf("CREATESTACK"); break;
+  case PUSHSTACK: printf("PUSHSTACK"); break;
+  case POPSTACK: printf("POPSTACK"); break;
+  case PRINTSTACK: printf("PRINTSTACK"); break;
   default:     printf("<unknown>"); break;
   }
 }
@@ -378,6 +387,75 @@ int execcode(word p[], word s[], word iargs[], int iargc, int /* boolean */ trac
       word v = (word)s[sp--];
       word* p = (word*)s[sp];
       p[2] = v;
+    } break;
+    case CREATESTACK: {
+      
+      int n = Untag(s[sp]);
+
+      if (n < 0) {
+        printf("Cannot create a stack with a size less than 0\n"); 
+        return -1;
+      }
+
+      uword allocation_length = n + 3; // As described in the assignement, n + 3 
+      word *p = allocate(STACKTAG, allocation_length, s, sp);
+      p[1] = n;
+      p[2] = 0;
+
+      s[sp] = p; // Place the pointer onto the stack
+    } break;
+    case PUSHSTACK: {
+      word *p = (word*)s[sp-1];
+      int v = Untag(s[sp]);
+      int n = p[1];
+      int top = p[2];
+
+      if(n == top) {
+        printf("Stack is full\n");
+        return -1;
+      }
+      
+      p[2+top+1] = v;
+      p[2] = top+1;
+      sp--; // Decrement to remove value from the real stack
+    } break;
+    case POPSTACK: {
+      word *p = s[sp];
+      int n = p[1];
+      int top = p[2];
+
+      if (top == 0) {
+        printf("There is nothing left to pop\n"); 
+        return -1;
+      }
+
+      int v = p[2+top];
+      p[2] = top - 1;
+      s[sp] = Tag(v);
+    } break;
+    case PRINTSTACK: {
+      word *p = s[sp];
+      int n = p[1];
+      int top = p[2];
+
+      // Print the header information
+      printf("STACK(%d, %d) [", n, top);
+
+      // Print values of the stack
+      for (int i = 1; i < top; i++)
+      {
+        int v = p[2+i];
+        printf("%d, ", v);
+      }
+
+      // Print the end of the stack
+      if(top != 0) {
+        int v = p[2+top];
+        printf("%d]\n", v);
+      } else {
+        printf("]\n");
+      }
+
     } break;
     default:
       printf("Illegal instruction " WORD_FMT " at address " WORD_FMT "\n",

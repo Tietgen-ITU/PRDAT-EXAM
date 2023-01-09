@@ -180,25 +180,29 @@ and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list =
          | "printc" -> [PRINTC]
          | "car"    -> [CAR]
          | "cdr"    -> [CDR]
+         | "createStack"  -> [CREATESTACK]
+         | "popStack"     -> [POPSTACK]
+         | "printStack"   -> [PRINTSTACK]
          | _        -> raise (Failure "unknown primitive 1"))
     | Prim2(ope, e1, e2) ->
       cExpr e1 varEnv funEnv
       @ cExpr e2 varEnv funEnv
       @ (match ope with
-         | "*"      -> [MUL]
-         | "+"      -> [ADD]
-         | "-"      -> [SUB]
-         | "/"      -> [DIV]
-         | "%"      -> [MOD]
-         | "=="     -> [EQ]
-         | "!="     -> [EQ; NOT]
-         | "<"      -> [LT]
-         | ">="     -> [LT; NOT]
-         | ">"      -> [SWAP; LT]
-         | "<="     -> [SWAP; LT; NOT]
-         | "cons"   -> [CONS]
-         | "setcar" -> [SETCAR]
-         | "setcdr" -> [SETCDR]
+         | "*"            -> [MUL]
+         | "+"            -> [ADD]
+         | "-"            -> [SUB]
+         | "/"            -> [DIV]
+         | "%"            -> [MOD]
+         | "=="           -> [EQ]
+         | "!="           -> [EQ; NOT]
+         | "<"            -> [LT]
+         | ">="           -> [LT; NOT]
+         | ">"            -> [SWAP; LT]
+         | "<="           -> [SWAP; LT; NOT]
+         | "cons"         -> [CONS]
+         | "setcar"       -> [SETCAR]
+         | "setcdr"       -> [SETCDR]
+         | "pushStack"    -> [PUSHSTACK]
          | _        -> raise (Failure "unknown primitive 2"))
     | Andalso(e1, e2) ->
       let labend   = newLabel()

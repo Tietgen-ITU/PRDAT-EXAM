@@ -25,7 +25,9 @@ let fromFile (filename : string) =
     use reader = new StreamReader(filename)
     let lexbuf = (*Lexing.*)LexBuffer<char>.FromTextReader reader
     try 
-      CPar.Main CLex.Token lexbuf
+      let prog = CPar.Main CLex.Token lexbuf
+      printf $"{prog} \n"
+      prog
     with 
       | exn -> let pos = lexbuf.EndPos 
                failwithf "%s in file %s near line %d, column %d\n" 
