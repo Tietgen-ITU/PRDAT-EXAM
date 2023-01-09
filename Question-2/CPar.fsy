@@ -14,7 +14,7 @@ let nl = CstI 10
 %token <int> CSTINT CSTBOOL
 %token <string> CSTSTRING NAME
 
-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
+%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE PUSHSTACK PRINTSTACK POPSTACK CREATESTACK
 %token NIL CONS CAR CDR DYNAMIC SETCAR SETCDR
 %token PLUS MINUS TIMES DIV MOD
 %token EQ NE GT LT GE LE
@@ -115,37 +115,41 @@ Expr:
 ;                                                              
                                                                
 ExprNotAccess:                                                 
-    AtExprNotAccess                     { $1                    }
-  | Access ASSIGN Expr                  { Assign($1, $3)        }
-  | NAME LPAR Exprs RPAR                { Call($1, $3)          }  
-  | NOT Expr                            { Prim1("!", $2)        }
-  | PRINT Expr                          { Prim1("printi", $2)   }
-  | PRINTLN                             { Prim1("printc", nl)   }
-  | Expr PLUS  Expr                     { Prim2("+",  $1, $3)   }
-  | Expr MINUS Expr                     { Prim2("-",  $1, $3)   }
-  | Expr TIMES Expr                     { Prim2("*",  $1, $3)   }
-  | Expr DIV   Expr                     { Prim2("/",  $1, $3)   }
-  | Expr MOD   Expr                     { Prim2("%",  $1, $3)   }
-  | Expr EQ    Expr                     { Prim2("==", $1, $3)   }
-  | Expr NE    Expr                     { Prim2("!=", $1, $3)   }
-  | Expr GT    Expr                     { Prim2(">",  $1, $3)   }
-  | Expr LT    Expr                     { Prim2("<",  $1, $3)   }
-  | Expr GE    Expr                     { Prim2(">=", $1, $3)   }
-  | Expr LE    Expr                     { Prim2("<=", $1, $3)   }
-  | Expr SEQAND Expr                    { Andalso($1, $3)       }
-  | Expr SEQOR  Expr                    { Orelse($1, $3)        }
+    AtExprNotAccess                     { $1                      }
+  | Access ASSIGN Expr                  { Assign($1, $3)          }
+  | NAME LPAR Exprs RPAR                { Call($1, $3)            }   
+  | NOT Expr                            { Prim1("!", $2)          }
+  | PRINT Expr                          { Prim1("printi", $2)     }
+  | PRINTLN                             { Prim1("printc", nl)     }
+  | PRINTSTACK LPAR Expr RPAR           { Prim1("printStack", $3) }
+  | Expr PLUS  Expr                     { Prim2("+",  $1, $3)     }
+  | Expr MINUS Expr                     { Prim2("-",  $1, $3)     }
+  | Expr TIMES Expr                     { Prim2("*",  $1, $3)     }
+  | Expr DIV   Expr                     { Prim2("/",  $1, $3)     }
+  | Expr MOD   Expr                     { Prim2("%",  $1, $3)     }
+  | Expr EQ    Expr                     { Prim2("==", $1, $3)     }
+  | Expr NE    Expr                     { Prim2("!=", $1, $3)     }
+  | Expr GT    Expr                     { Prim2(">",  $1, $3)     }
+  | Expr LT    Expr                     { Prim2("<",  $1, $3)     }
+  | Expr GE    Expr                     { Prim2(">=", $1, $3)     }
+  | Expr LE    Expr                     { Prim2("<=", $1, $3)     }
+  | Expr SEQAND Expr                    { Andalso($1, $3)         }
+  | Expr SEQOR  Expr                    { Orelse($1, $3)          }
 ;
 
 AtExprNotAccess:
-    Const                               { CstI $1               }
-  | LPAR ExprNotAccess RPAR             { $2                    } 
-  | AMP Access                          { Addr $2               }
-  | NIL                                 { CstN                  }
-  | CONS LPAR Expr COMMA Expr RPAR      { Prim2("cons",$3,$5)   }
-  | CAR LPAR Expr RPAR                  { Prim1("car", $3)      }
-  | CDR LPAR Expr RPAR                  { Prim1("cdr", $3)      }
-  | SETCAR LPAR Expr COMMA Expr RPAR    { Prim2("setcar",$3,$5) }
-  | SETCDR LPAR Expr COMMA Expr RPAR    { Prim2("setcdr",$3,$5) }
+    Const                               { CstI $1                   }
+  | LPAR ExprNotAccess RPAR             { $2                        }  
+  | AMP Access                          { Addr $2                   }
+  | NIL                                 { CstN                      }
+  | CONS LPAR Expr COMMA Expr RPAR      { Prim2("cons",$3,$5)       }
+  | CAR LPAR Expr RPAR                  { Prim1("car", $3)          }
+  | CDR LPAR Expr RPAR                  { Prim1("cdr", $3)          }
+  | SETCAR LPAR Expr COMMA Expr RPAR    { Prim2("setcar",$3,$5)     }
+  | SETCDR LPAR Expr COMMA Expr RPAR    { Prim2("setcdr",$3,$5)     }
+  | CREATESTACK LPAR Expr RPAR          { Prim1("createStack", $3)  }
+  | PUSHSTACK LPAR Expr COMMA Expr RPAR { Prim2("pushStack", $3, $5)}
+  | POPSTACK LPAR Expr COMMA Expr RPAR  { Prim2("popStack", $3, $5) }
 ;
 
 Access:
