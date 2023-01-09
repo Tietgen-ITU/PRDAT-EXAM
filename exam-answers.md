@@ -386,7 +386,7 @@ Output:
 
 ## Opgave 3
 
-### 1.
+### Delopagve 1.
 Jeg har tilføjet følgende linje i `Absyn.fs`:
 ```F#
 type typ =
@@ -408,3 +408,99 @@ and access =
 Hvilket tillader os at lave abstrakte syntaks træer, som signalere at vi gerne vil hente en værdi på en speciel plads i en tupel:
 
 ![](2023-01-09-19-08-06.png)
+
+### Delopgave 2.
+For at kunne parse en tuppel, er følgende blevet oprettet som tokens inde i `CLex.fsl`:
+
+```F#
+rule Token = parse
+    | ...
+    | "(|"            { LPARBAR }
+    | "|)"            { BARRPAR }
+    | ...
+```
+### Delopgave 3.
+
+Jeg har registreret de nye tokens i parser specifikationen `CPar.fsy`:
+```F#
+%token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP LPARBAR BARRPAR
+```
+
+Herudover er `LPARBAR` tilføjet med samme precedence som `LBRACK` og dermed er den også `%nonassoc`:
+```F#
+%nonassoc LBRACK LPARBAR 
+``` 
+
+Samt parsing af både at oprette en tupel samt at tilgå værdier:
+```F#
+Vardesc: 
+    ...
+    | Vardesc LPARBAR BARRPAR             { compose1 (fun t -> TypT(t, None)) $1    }
+    | Vardesc LPARBAR CSTINT BARRPAR      { compose1 (fun t -> TypT(t, Some $3)) $1 }
+;
+
+Access:
+    ...
+    | Access LPARBAR Expr BARRPAR         { TupIndex($1, $3)    }
+;
+```
+
+Både lexer og parser bliver compilet via et script som ser således ud:
+```
+#!/bin/bash
+binDir=/data/bin
+currDir=$PWD
+
+mono $binDir/fslex.exe --unicode CLex.fsl
+mono $binDir/fsyacc.exe --module CPar CPar.fsy
+
+...
+```
+
+Resultatet af at compile lexer og parser ser således ud:
+
+![](2023-01-09-19-24-14.png)
+
+og output fra at parse eksemplerne om til abstrakte syntaks træer ser således ud:
+
+![](2023-01-09-19-37-14.png)
+
+### Delopgave 4. 
+Her er følgende ændringer til `Comp.fs`:
+
+```F#
+let allocate (kind : int -> var) (typ, x) (varEnv : varEnv) : varEnv * instr list =
+    let (env, fdepth) = varEnv 
+    match typ with
+    | ...
+    | TypT (TypT _, _) -> 
+      raise (Failure "allocate: tupel of tupel is not permitted")
+    | TypT (t, Some i) -> 
+      let newEnv = ((x, (kind (fdepth), typ)) :: env, fdepth+i) 
+      let code = [INCSP i]
+      (newEnv, code)
+    | ...
+
+and cAccess access varEnv funEnv : instr list =
+    match access with 
+    | ...
+    | TupIndex(acc, idx) -> 
+      cAccess acc varEnv funEnv @ cExpr idx varEnv funEnv @ [ADD]
+```
+
+### Delopgave 5.
+I ovenstående delopgave kan man se ændringerne i de givne filer.
+
+De ændringer der er lavet i lexer specificationen er til for at danne tokens af følgende form `(|` `|)` kaldet `LPARBAR` og `BARRPAR`. Disse tokens er vigtige da de skal benyttes af vores parser til at omdanne det til et abstrakt syntaks træ. Derfor har vi i parser specifikationen også registreret de givne token, `LPARBAR` og `BARRPAR`, så vi kan begynde at specificere hvordan en tuppel bliver erklæret og hvordan man kan tilgå dets elementer. Derfor bliver der oprettet nogle regler i henholdsvis `Vardesc` og `Access`, som sørger for at lave de angive regler om til det abstrakte syntaks træ. Alle typerne i det abstrakte syntaks træ er angivet i `Absyn.fs`. 
+
+Herudover, skal vi have lavet vores abstrakte syntaks til noget bytecode. Det er det vi bruger `Comp.fs` til. I `Comp.fs` skulle der tilføjes noget 2 steder. `allocate` og `cAccess`. I Allocate er det meningen at vi skal definere hvordan vi gemmer tuppel værdierne på stakken. Det bliver gjort ved at give værdierne en type og herefter indikere hvor mange værdier der skal være plads til. Det indikere vi ved at sige `fdepth+i` på `varEnv` næste variabel offset, hvor `fdepth` er værdien for den nuværende offset og `i` er antallet af værdier i tupplen. Tilsidst bliver stack pointeren incremented med `i`.
+Herudover er der tilføjet en regel, som fejl tjek, i det tilfælde at der bliver forsøgt at oprette en tuppel i en tuppel f.eks. `TypT (TypT _, _)`
+
+I `cAccess` skal vi lave numeric byte code til at hente værdier i tupplen. Da tupplen bare er en lang række værdier på stacken, kan vi hente addressen for den første variable ved at sige `cAccess acc varEnv funEnv`. Herefter henter vi den position som vi gerne vil have værdien fra og tilføjer en byte code instruktion om at plusse de 2 addresser sammen.
+
+Herved har vi implementationen af en tuppel i Micro-c sproget.
+
+### 6.
+Efter at have compileret `tupple.out` og kører det med `Machine.java`, kommer dette output:
+
+![](2023-01-09-20-18-22.png)
