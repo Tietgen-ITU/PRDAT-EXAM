@@ -387,3 +387,24 @@ Output:
 ## Opgave 3
 
 ### 1.
+Jeg har tilføjet følgende linje i `Absyn.fs`:
+```F#
+type typ =
+    | ...
+    | TypT of typ * int optio
+```
+
+Det giver følgende resultat:
+
+![](2023-01-09-19-03-41.png)
+
+Herudover for at kunne tilgå bestemte værdier i en tupel er følgende type blevet tilføjet i `Absyn.fs`:
+```F#
+and access =                                                       
+    | ...
+    | TupIndex of access * expr
+```
+
+Hvilket tillader os at lave abstrakte syntaks træer, som signalere at vi gerne vil hente en værdi på en speciel plads i en tupel:
+
+![](2023-01-09-19-08-06.png)
