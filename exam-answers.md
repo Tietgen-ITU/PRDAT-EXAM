@@ -316,7 +316,9 @@ Det har givet følgende resultat:
 ![](2023-01-09-13-54-00.png)
 
 ### 4.
-For at test om `createStack` virker, så er det en god ide at teste om den kan lave den, som vi allerede har gjort. Men `createStack` har nogle edge cases som er gode at få testet. Her tænker jeg blandt andet om man kan lave en stack som har en størrelse på 0 og om den kaster en fejl når det er man prøver at lave en stack hvor $n < 0$.
+For at test om `createStack` virker, så er det en god ide at teste om den kan lave den, som vi allerede har gjort. Men `createStack` har nogle edge cases som er gode at få testet. Her i blandt er der:
+- kan lave en stack som har en størrelse på 
+- kaster en fejl når det er man prøver at lave en stack hvor $n < 0$.
 
 **Test case hvor $n = 0$**
 ```C
@@ -348,9 +350,10 @@ Output:
 For at teste `pushStack` har vi de generelle edge cases igen:
 - Kan man push en værdi på stakken når der ikke er flere pladser
 - Pushe en værdi på den allersidste plads
-- Pushe den først værdi
+- Pushe en værdi når det er at stakken er tom
 
 Herudover, skal der testes om det er muligt at push en værdi efter hindanden og sikre sig at de ikke bliver overskrevet. 
+Derfor har jeg lavet følgende 2 test cases:
 
 **Test case hvor der ikke er flere pladser tilbage i stacken**
 ```C
@@ -380,3 +383,7 @@ void main(){
 Output:
 
 ![](2023-01-09-15-11-15.png)
+
+## Opgave 3
+
+### 1.
