@@ -70,3 +70,10 @@ let ex5 = fromString
                  in fib 25 
                  end
               end";;
+
+let ex01 = fromString @"let l1 = [2, 3] in let l2 = [1, 4] in l1 @ l2 = [2, 3, 1, 4] end end";;
+//let ex02 = fromString "let l = [] in l end";;
+let ex03 = fromString "let l = [43] in l @ [3+4] end";;
+let ex04 = fromString "let l = [3] in l @ [3] = [3+4] end";;
+let ex05 = fromString "let f x = x+1 in [f] end";;
+let ex06 = fromString "let id x = x in [id] end";;
